@@ -503,6 +503,7 @@ int ikusten_da(triobj *aukptr, triobj *optr, int i){
     punto p1,p2,p3;
     hiruki *tptr;
     int k;
+    double n[3];
 
     tptr = optr->triptr+i;
     if (proiekzioa == 1){
@@ -522,15 +523,17 @@ int ikusten_da(triobj *aukptr, triobj *optr, int i){
         vkamara[2] -= p1.z;
     }
     
-    mxp(&p1,optr->mptr->m,tptr->p1);
-    mxp(&p2,optr->mptr->m,tptr->p2);
-    mxp(&p3,optr->mptr->m,tptr->p3);
+    //mxp(&p1,optr->mptr->m,tptr->p1);
+    //mxp(&p2,optr->mptr->m,tptr->p2);
+    //mxp(&p3,optr->mptr->m,tptr->p3);
 
+    //bektore_normala_kalkulatu(&(tptr->N[0]), p1, p2, p3);
+    //&(tptr->N[0]) 
 
-    bektore_normala_kalkulatu(&(tptr->N[0]), p1, p2, p3);
-    //marraztu edo ez
+    //Munduko erreferntzia sisteman nago.
+    matrizen_eta_bektorearen_biderketa(&(n[0]),&(optr->mptr->m[0]) ,&(tptr->N[0]));
     glColor3ub(255, 255, 255);
-    if (biderketa_eskalarra(&(tptr->N[0]), &(vkamara[0])) <= 0){
+    if (biderketa_eskalarra((&(n[0])), &(vkamara[0])) <= 0){
         if (back_culling == 1){
             return 1;
         }else{
@@ -577,6 +580,7 @@ void dibujar_triangulo(triobj *optr, int i){
     float cambio1,cambio1z,cambio1u,cambio1v,cambio2,cambio2z,cambio2u,cambio2v;
     punto p1,p2,p3;
     punto e1,e2,e;
+    double n[3];
 
     if (i >= optr->num_triangles) return;
     tptr = optr->triptr+i;
@@ -592,8 +596,8 @@ void dibujar_triangulo(triobj *optr, int i){
         if (mxpp(&p2,modelview1,tptr->p2) == 1) return;
         if (mxpp(&p3,modelview1,tptr->p3) == 1) return;
     }
-
-    bektore_normala_kalkulatu(&(tptr->N[0]), p1, p2, p3);
+    matrizen_eta_bektorearen_biderketa(&(n[0]),&(modelview1[0]) ,&(tptr->N[0]));
+    //bektore_normala_kalkulatu(&(tptr->N[0]), p1, p2, p3);
     if (lineak == 1){
         glBegin(GL_POLYGON);
             glVertex3d(p1.x, p1.y, p1.z);
@@ -603,7 +607,8 @@ void dibujar_triangulo(triobj *optr, int i){
         if (bektoreak == 1){
             glBegin(GL_LINES);
                 glVertex3d(p1.x, p1.y, p1.z);
-                glVertex3d(p1.x + 50* tptr->N[0], p1.y + 50* tptr->N[1], p1.z + 50* tptr->N[2]);
+                glVertex3d(p1.x + 50* n[0], p1.y + 50* n[1], p1.z + 50* n[2]);
+                //glVertex3d(p1.x + 50* tptr->N[0], p1.y + 50* tptr->N[1], p1.z + 50* tptr->N[2]);
             glEnd();
 
         }
