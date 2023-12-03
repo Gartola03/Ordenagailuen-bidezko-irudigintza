@@ -409,12 +409,12 @@ void  dibujar_linea_z(int linea,float c1x, float c1z, float c1u,float c1v,float 
 }
 
 
-void print_matrizea(char *str, triobj *auxptr){
+void print_matrizea(char *str, double *m){
     int i;
 
     printf("%s\n",str);
     for (i = 0;i<4;i++)
-    printf("%lf, %lf, %lf, %lf\n", auxptr->mptr->m[i*4], auxptr->mptr->m[i*4+1], auxptr->mptr->m[i*4+2], auxptr->mptr->m[i*4+3]);
+    printf("%lf, %lf, %lf, %lf\n", m[i*4], m[i*4+1], m[i*4+2], m[i*4+3]);
 }
 
 
@@ -422,51 +422,52 @@ void info (char *str){
     printf("\n");
     printf("INFORMAZIOA:\n");
     if (proiekzioa == 1){
-        printf("Proiekzioa paraleloan ikusten ari zara.\n");
+        printf("-PROIEKZIOA PARALELOAN ikusten ari zara.\n");
     } else{
-        printf("Proiekzioa perspektiban ikusten ari zara.\n");
+        printf("-PROIEKZIOA PERSPEKTIBAN ikusten ari zara.\n");
     }
 
     if (ikuspegia == 1){
-        printf("Kamara ikuspegian ikusten ari zara.\n");
+        printf("-KAMERAREN IKUSPEGIAN ikusten ari zara.\n");
     } else{
-        printf("Objektuaren ikuspegian ikusten ari zara.\n");
+        printf("-OBJEKTUAREN IKUSPEGIAN ikusten ari zara.\n");
     }
 
     if (kamara == 1){
-        printf("Kamara aukeratzen ari zara.\n");
+        printf("-KAMERA AUKERATZEN ari zara.\n");
     } else{
-        printf("Objektua aukeratzen ari zara.\n");
+        printf("-OBJEKTUA AUKERATZEN ari zara.\n");
     }
 
     if (ald_lokala == 1){
-        printf("Aldaketa lokala (hegan moduan) eragiten ari zara.\n");
+        printf("-ALDAKETA LOKALA (hegan moduan) eragiten ari zara.\n");
     } else{
-        printf("Aldaketa globala (analisi moduan) eragiten ari zara.\n");
+        printf("-ALDAKETA GLOBALA (analisi moduan) eragiten ari zara.\n");
     }
 
     if (aldaketa == 't'){
-        printf("Translaziok eragingo dizkiozu.\n");
+        printf("-TRANSLAZIOAK eragingo dizkiozu.\n");
     } else{
-        printf("Biraketak eragingo dizkiozu.\n");
+        printf("-BIRAKETAK eragingo dizkiozu.\n");
     }
 
     if (bektoreak == 1){
-        printf("Bektoreak aktibatuta daude.\n");
+        printf("-BEKTOREAK AKTIBATUTA daude.\n");
     } else{
-        printf("Bektoreak desakibatuta daude.\n");
+        printf("-BEKTOREAK DESAKTIBATUTA daude.\n");
     }
 
     if (back_culling == 0){
-        printf("Atze-aurpegien marrazketa egiten ari zara.\n");
+        printf("-ATZE-AURPEGIEN MARRAZKETA egiten ari zara.\n");
     } else{
-        printf("Atze-aurpegien ezabaketa egiten ari zara.\n");
+        printf("-ATZE-AURPEGIEN EZABAKETA egiten ari zara.\n");
     }
+    printf("-KAMERAREN KOKAPENA: ");
+    printf("%lf, %lf, %lf", selk_ptr->mptr->m[3], selk_ptr->mptr->m[7], selk_ptr->mptr->m[11]);
     printf("\n");
 }
 
-int mxp(punto *pptr, double m[16], punto p)
-{
+int mxp(punto *pptr, double m[16], punto p){
     pptr->x = m[0]*p.x + m[1]*p.y + m[2]*p.z + m[3];
     pptr->y = m[4]*p.x + m[5]*p.y + m[6]*p.z + m[7];
     pptr->z = m[8]*p.x + m[9]*p.y + m[10]*p.z + m[11];
@@ -475,17 +476,18 @@ int mxp(punto *pptr, double m[16], punto p)
 
 }
 
-int mxpp(punto *pptr, double m[16], punto p)
-{
+int mxpp(punto *pptr, double m[16], punto p){
     double x1,y1,z1,w;
+
     x1 = m[0]*p.x + m[1]*p.y + m[2]*p.z + m[3];
     y1 = m[4]*p.x + m[5]*p.y + m[6]*p.z + m[7];
     z1 = m[8]*p.x + m[9]*p.y + m[10]*p.z + m[11];
     w = m[12]*p.x + m[13]*p.y + m[14]*p.z + m[15];
     
-    if (w == 0 || w ==-0){
+    if (w <= 0){
         return 1;
     }
+
     x1 = 500*x1/w;
     y1 = 500*y1/w;
     z1 = -500*z1/w;
@@ -496,7 +498,6 @@ int mxpp(punto *pptr, double m[16], punto p)
     pptr->u = p.u;
     pptr->v = p.v;
 
-    return 0;
 }
 
 int ikusten_da(triobj *aukptr, triobj *optr, int i){
@@ -515,25 +516,19 @@ int ikusten_da(triobj *aukptr, triobj *optr, int i){
         vkamara[0] = aukptr->mptr->m[3];
         vkamara[1] = aukptr->mptr->m[7];
         vkamara[2] = aukptr->mptr->m[11];
-
+        //optr->mptr->m
         mxp(&p1,optr->mptr->m,tptr->p1);
 
         vkamara[0] -= p1.x;
         vkamara[1] -= p1.y;
         vkamara[2] -= p1.z;
     }
-    
-    //mxp(&p1,optr->mptr->m,tptr->p1);
-    //mxp(&p2,optr->mptr->m,tptr->p2);
-    //mxp(&p3,optr->mptr->m,tptr->p3);
-
-    //bektore_normala_kalkulatu(&(tptr->N[0]), p1, p2, p3);
-    //&(tptr->N[0]) 
 
     //Munduko erreferntzia sisteman nago.
     matrizen_eta_bektorearen_biderketa(&(n[0]),&(optr->mptr->m[0]) ,&(tptr->N[0]));
     glColor3ub(255, 255, 255);
     if (biderketa_eskalarra((&(n[0])), &(vkamara[0])) <= 0){
+        
         if (back_culling == 1){
             return 1;
         }else{
@@ -581,6 +576,7 @@ void dibujar_triangulo(triobj *optr, int i){
     punto p1,p2,p3;
     punto e1,e2,e;
     double n[3];
+    int a,b,c;
 
     if (i >= optr->num_triangles) return;
     tptr = optr->triptr+i;
@@ -592,12 +588,15 @@ void dibujar_triangulo(triobj *optr, int i){
         mxp(&p3,modelview1,tptr->p3);
 
     } else{
-        if (mxpp(&p1,modelview1,tptr->p1) == 1) return;
-        if (mxpp(&p2,modelview1,tptr->p2) == 1) return;
-        if (mxpp(&p3,modelview1,tptr->p3) == 1) return;
+        a = mxpp(&p1,modelview1,tptr->p1);
+        b = mxpp(&p2,modelview1,tptr->p2);
+        c = mxpp(&p3,modelview1,tptr->p3); 
+        if (a == 1 || b == 1 || c == 1) return;
+        
     }
+
     matrizen_eta_bektorearen_biderketa(&(n[0]),&(modelview1[0]) ,&(tptr->N[0]));
-    //bektore_normala_kalkulatu(&(tptr->N[0]), p1, p2, p3);
+
     if (lineak == 1){
         glBegin(GL_POLYGON);
             glVertex3d(p1.x, p1.y, p1.z);
@@ -608,7 +607,6 @@ void dibujar_triangulo(triobj *optr, int i){
             glBegin(GL_LINES);
                 glVertex3d(p1.x, p1.y, p1.z);
                 glVertex3d(p1.x + 50* n[0], p1.y + 50* n[1], p1.z + 50* n[2]);
-                //glVertex3d(p1.x + 50* tptr->N[0], p1.y + 50* tptr->N[1], p1.z + 50* tptr->N[2]);
             glEnd();
 
         }
@@ -756,9 +754,8 @@ static void marraztu(void){
                 }
         } else{
             modelview_kalkulatu(selk_ptr);
-            if (ikusten_da(aukptr, selk_ptr, i) == 0){
-                dibujar_triangulo(selk_ptr,indexx);
-            }
+            if (ikusten_da(aukptr, selk_ptr, i) == 0) dibujar_triangulo(selk_ptr,indexx);
+            
         }
     } 
 
@@ -771,24 +768,18 @@ static void marraztu(void){
                 for (auxptr =foptr; auxptr != 0; auxptr = auxptr->hptr){
                     modelview_kalkulatu(auxptr);
                     for (i =0; i < auxptr->num_triangles; i++){
-                        if (ikusten_da(aukptr, auxptr, i) == 0){
-                            dibujar_triangulo(auxptr,i);
-                        }                          
+                        if (ikusten_da(aukptr, auxptr, i) == 0) dibujar_triangulo(auxptr,i);                           
                     }
                 }
             } else{
                 modelview_kalkulatu(sel_ptr);
                 for (i =0; i < sel_ptr->num_triangles; i++){
-                    if (ikusten_da(aukptr, sel_ptr, i) == 0){
-                        dibujar_triangulo(sel_ptr,i);
-                    }
+                    if (ikusten_da(aukptr, sel_ptr, i) == 0) dibujar_triangulo(sel_ptr,i);
                 }
             }
         } else{
             modelview_kalkulatu(sel_ptr);
-            if (ikusten_da(aukptr, sel_ptr, i) == 0){
-                dibujar_triangulo(sel_ptr,indexx);
-            }
+            if (ikusten_da(aukptr, sel_ptr, i) == 0) dibujar_triangulo(sel_ptr,indexx);   
         }
     } 
 
