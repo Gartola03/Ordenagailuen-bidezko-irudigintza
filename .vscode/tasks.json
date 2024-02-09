@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+        "label": "Konpilatu fitaxtegi guztiak",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+            "*.c",
+            "-lGL",
+            "-lGLU",
+            "-lglut",
+            "-lm"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [
+            "$gcc"
+        ],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        }
+        }
+    ]
+}
